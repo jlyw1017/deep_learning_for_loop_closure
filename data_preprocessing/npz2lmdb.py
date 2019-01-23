@@ -89,7 +89,7 @@ class Npz2lmdb:
 
         print('Size of scan (MByte): {0}'.format(float(self.m_scan.nbytes)/1000000))
 
-        interval = int(round(self.m_original_frequency / frequency))
+        interval = int(round(self.m_original_frequency / frequency)) '''求整，10/0.5,每20个取一个数据'''
 
         # determine map_size of lmdb
         if 10*self.m_scan.nbytes>10000000:
@@ -109,8 +109,8 @@ class Npz2lmdb:
         train_label_env = lmdb.open(path+'train_label', map_size=map_size_label)
         train_label_txn = train_label_env.begin(write=True, buffers=True)
 
-        for i in range(train_length-interval):
-            one_data = np.zeros((1,2,1081), dtype=np.float32)
+        for i in range(train_length-interval):'''遍历数据集，interval是取数据的间隔，减去是因为最后的那些数据没有可以匹配的了'''
+            one_data = np.zeros((1,2,1081), dtype=np.float32) '''生成一个1*2*1081的矩阵'''
             one_data[0,0,:] = self.m_scan_noisy[i,:]
             one_data[0,1,:] = self.m_scan_noisy[i+interval,:]
 
@@ -119,11 +119,14 @@ class Npz2lmdb:
             train_data_txn.put(str_id, datum.SerializeToString())
 
             # calculate the relative dx, dy, dtheta ----begin
+            ''' 坐标相减'''
+
+
             idx_prev = i
             idx_curr = i+interval
             yaw_prev_ref = self.m_reference_absolute[idx_prev, 2]
             x_prev_curr_ref = self.m_reference_absolute[idx_curr, 0] - self.m_reference_absolute[idx_prev, 0]
-            y_prev_curr_ref = self.m_reference_absolute[idx_curr, 1] - self.m_reference_absolute[idx_prev, 1]
+            y_prev_curr_ref = self.m_reference_absolute[idx_curr, 1] - self.m_reference_absolute[idx_prev, 1]  ''''''
             theta_prev_curr_ref = self.m_reference_absolute[idx_curr, 2] - self.m_reference_absolute[idx_prev, 2]
 
             dx_ref = x_prev_curr_ref * math.cos(yaw_prev_ref) + y_prev_curr_ref * math.sin(yaw_prev_ref)
