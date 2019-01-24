@@ -119,8 +119,11 @@ class Npz2lmdb:
             train_data_txn.put(str_id, datum.SerializeToString())
 
             # calculate the relative dx, dy, dtheta ----begin
-            ''' 坐标相减'''
-
+            ''' 绝对坐标相减
+                然后生成相对坐标
+                有绝对坐标，pose1,pose2
+                这里是转移到坐标1看坐标2的相对变换
+            '''
 
             idx_prev = i
             idx_curr = i+interval
